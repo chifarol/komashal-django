@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "komashal"
+version = "0.1.0"
+description = "An E-Commerce App"
+authors = ["chifarol <ilodigwechinaza@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+djangorestframework = "^3.14.0"
+Pillow = "^9.4.0"
+cloudinary = "^1.31.0"
+cryptography = "^39.0.0"
+Django = "^4.1.6"
+pycparser = "^2.21"
+dj-database-url = "^1.2.0"
+psycopg2-binary = "^2.9.5"
+gunicorn = "^20.1.0"
+whitenoise = "^6.3.0"
+knox = "^0.1.14"
+django-environ = "^0.9.0"
+django-rest-knox = "^4.2.0"
+python-dotenv = "^0.21.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
