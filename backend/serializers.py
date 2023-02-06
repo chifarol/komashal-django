@@ -1,6 +1,9 @@
 from rest_framework import serializers 
 from django.contrib.auth.models import User
 
+from .models import Region, City,  Address, UserAddress, PickupStation,Brand, ProductCategory,ProductImage, Promotion, Coupon,ProductCoupon,  ProductPromotion, Product, ProductItem,  Cart, CartItem, Order, Wishlist, UserReview
+
+
 # Register Serializer
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,3 +20,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email')
+
+class RegionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Region
+        fields = ('state', 'status')

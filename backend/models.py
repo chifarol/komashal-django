@@ -10,43 +10,49 @@ GENERIC_STATUS=[
 
 # eligible states for delivery
 class Region(models.Model):
-    state = models.CharField(max_length=100, blank=False, null=False)
+    state = models.CharField(max_length=100, blank=False, null=False, unique=True)
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
 # eligible cities in states for delivery
 class City(models.Model):
-    region_id = models.CharField(max_length=100, blank=False, null=False)
-    name = models.ForeignKey(Region, related_name="cities", on_delete=models.CASCADE, blank=False)
+    region_id = models.ForeignKey(Region, related_name="cities", on_delete=models.CASCADE, blank=False)
+    name = models.CharField(max_length=100, blank=False, null=False,  unique=True)
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
-# company pickup station addresses
-class PickupStation(models.Model):
-    state = models.ForeignKey(Region, related_name="pickup_stations", on_delete=models.CASCADE, blank=False)
-    city = models.ForeignKey(City, related_name="pickup_stations", on_delete=models.CASCADE, blank=False)
-    address = models.CharField(max_length=250, blank=False, null=False)
-    additional_info = models.CharField(max_length=250, blank=True, default="")
 
 # user shipping addresses
 class Address(models.Model):
-    first_name = models.CharField(max_length=250, blank=False, null=False)
-    last_name = models.CharField(max_length=250, blank=False, null=False)
     delivery_address = models.CharField(max_length=250, blank=False, null=False)
-    additional_info = models.CharField(max_length=250, blank=True, default="")
     state = models.ForeignKey(Region, related_name="addresses", on_delete=models.CASCADE, blank=False)
     city = models.ForeignKey(City, related_name="addresses", on_delete=models.CASCADE, blank=False)
-    phone = models.CharField(max_length=250,default="", blank=False)
-    alt_phone = models.CharField(max_length=250, blank=True, default="")
-    status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
+    additional_info = models.CharField(max_length=250, blank=True, default="")
+
+# company pickup station addresses
+class PickupStation(models.Model):
+    name = models.CharField(max_length=100, blank=False, unique=True)
+    address_id = models.ForeignKey(Address, related_name="pickup_stations", on_delete=models.CASCADE, default=1)
+
+  
 
 # user shipping addresses
 class UserAddress(models.Model):
+    ADDRESS_TYPES = [
+        ('user_address', 'User Address'),
+        ('pickup_address', 'Pickup Station Address'),
+    ]
     user_id = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE)
     address_id = models.ForeignKey(Address, related_name="users", on_delete=models.CASCADE, blank=False)
+    first_name = models.CharField(max_length=250, blank=False, null=False, default="")
+    last_name = models.CharField(max_length=250, blank=False, null=False, default="")
+    phone = models.CharField(max_length=250,default="", blank=False)
+    alt_phone = models.CharField(max_length=250, blank=True, default="")
+    type=models.CharField(max_length=100, blank=False, default="user_address", choices=ADDRESS_TYPES)
+    status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
     
 
 # promotion or discounts
 class Promotion(models.Model):
-    name = models.CharField(max_length=250, blank=False, null=False)
+    name = models.CharField(max_length=250, blank=False, null=False, unique=True)
     description = models.CharField(max_length=250, blank=True, default="")
     discount_rate = models.IntegerField(default=0, validators=[ MaxValueValidator(100),  MinValueValidator(0) ])
     start_date = models.DateTimeField(blank=False)
@@ -54,7 +60,7 @@ class Promotion(models.Model):
 
 # coupons
 class Coupon(models.Model):
-    name = models.CharField(max_length=250, blank=False, null=False)
+    name = models.CharField(max_length=250, blank=False, null=False, unique=True)
     description = models.CharField(max_length=250, blank=True, default="")
     discount_rate = models.IntegerField(default=0, validators=[ MaxValueValidator(100),  MinValueValidator(0) ])
     start_date = models.DateTimeField(blank=False)
@@ -71,7 +77,7 @@ class Brand(models.Model):
 # Product Categories
 class ProductCategory(models.Model):
     parent = models.ForeignKey("self", on_delete=models.CASCADE, related_name="child_category", null=True, blank=True)
-    name = models.CharField(max_length=100, blank=False, null=False)
+    name = models.CharField(max_length=100, blank=False, null=False, unique=True)
     description = models.CharField(max_length=250, blank=True, default="")
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
@@ -133,7 +139,7 @@ class Order(models.Model):
 
     shipping_method=models.CharField(max_length=100, blank=False, default="pickup_station", choices=SHIPPING_METHODS)
 
-    address= models.ForeignKey(Address, on_delete=models.PROTECT,related_name="orders")
+    address= models.ForeignKey(Address, on_delete=models.SET_NULL, null=True, related_name="orders")
 
     date= models.DateTimeField(auto_now_add=True)
 
