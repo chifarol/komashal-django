@@ -60,7 +60,7 @@ class Coupon(models.Model):
     start_date = models.DateTimeField(blank=False)
     end_date = models.DateTimeField(blank=False)
 
-    Token=models.CharField(max_length=100, blank=False)
+    token=models.CharField(max_length=100, blank=False)
     
 # brands
 class Brand(models.Model):
@@ -143,7 +143,12 @@ class Order(models.Model):
 
 # Carts
 class Cart(models.Model):
+    CART_STATUS = [
+        ('not_checked_out','Yet to Check Out'),
+        ('checked_out','Has Checked Out'),
+    ]
     user_id=models.ForeignKey(User, on_delete=models.CASCADE,related_name="carts")
+    status = models.CharField(max_length=100, blank=False, default="checked_out", choices=CART_STATUS)
     
 
 # Cart Items
@@ -156,15 +161,11 @@ class Wishlist(models.Model):
     user_id=models.ForeignKey(User, on_delete=models.CASCADE,related_name="wishlist")
     product_id=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="in_wishlist")
 
-# Checkout
-class Checkout(models.Model):
-    cart_id=models.ForeignKey(Cart, on_delete=models.CASCADE,related_name="on_checkout")
-
 # User Review 
 class UserReview(models.Model):
     user_id=models.ForeignKey(User, on_delete=models.CASCADE,related_name="reviews")
     product_id=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="reviews")
     rating_value=models.IntegerField(default=3, validators=[ MaxValueValidator(5),  MinValueValidator(1) ])
-    comment=models.CharField(max_length=100, blank=True, default="")
+    comment=models.CharField(max_length=250, blank=True, default="")
 
 
