@@ -1,7 +1,11 @@
 from django.contrib import admin
-from .models import Region, City,  Address, UserAddress, PickupStation,Brand, ProductCategory,ProductImage, Promotion, Coupon,ProductCoupon,  ProductPromotion, Product, ProductItem,  Cart, CartItem, Order, Wishlist, UserReview
+from .models import Region, City,  Address, UserAddress, PickupStation,Brand, ProductCategory,ProductImage, Promotion, Coupon,ProductCoupon,  ProductPromotion, Product, ProductItem,  Cart, CartItem, Order, Wishlist, UserReview, Profile
 
 from django.contrib.auth.models import User
+
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'first_name', 'last_name', 'phone')
 
 @admin.register(Region)
 class RegionAdmin(admin.ModelAdmin):

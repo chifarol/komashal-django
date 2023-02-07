@@ -7,6 +7,12 @@ GENERIC_STATUS=[
         ("active","Active"),
         ("inactive","Cancelled")
     ]
+# additional user info 
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    first_name = models.CharField(max_length=100, blank=True, default="")
+    last_name = models.CharField(max_length=100, blank=True, default="")
+    phone = models.CharField(max_length=100, blank=True, default="")
 
 # eligible states for delivery
 class Region(models.Model):
@@ -15,7 +21,7 @@ class Region(models.Model):
 
 # eligible cities in states for delivery
 class City(models.Model):
-    region_id = models.ForeignKey(Region, related_name="cities", on_delete=models.CASCADE, blank=False)
+    region = models.ForeignKey(Region, related_name="cities", on_delete=models.CASCADE, blank=False)
     name = models.CharField(max_length=100, blank=False, null=False,  unique=True)
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
@@ -30,7 +36,7 @@ class Address(models.Model):
 # company pickup station addresses
 class PickupStation(models.Model):
     name = models.CharField(max_length=100, blank=False, unique=True)
-    address_id = models.ForeignKey(Address, related_name="pickup_stations", on_delete=models.CASCADE, default=1)
+    address = models.ForeignKey(Address, related_name="pickup_stations", on_delete=models.CASCADE, default=1)
 
   
 
@@ -40,8 +46,8 @@ class UserAddress(models.Model):
         ('user_address', 'User Address'),
         ('pickup_address', 'Pickup Station Address'),
     ]
-    user_id = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE)
-    address_id = models.ForeignKey(Address, related_name="users", on_delete=models.CASCADE, blank=False)
+    user = models.ForeignKey(User, related_name="addresses", on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, related_name="users", on_delete=models.CASCADE, blank=False)
     first_name = models.CharField(max_length=250, blank=False, null=False, default="")
     last_name = models.CharField(max_length=250, blank=False, null=False, default="")
     phone = models.CharField(max_length=250,default="", blank=False)
@@ -91,28 +97,28 @@ class Product(models.Model):
 
 # Product Items
 class ProductItem(models.Model):
-    product_id = models.ForeignKey(Product, on_delete=models.SET_NULL, related_name="product_items", blank=False, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, related_name="product_items", blank=False, null=True)
     name = models.CharField(max_length=100, blank=False, null=False)
     description = models.CharField(max_length=250, blank=True, default="")
-    brand_id = models.ForeignKey(Brand, on_delete=models.SET_NULL, blank=True,related_name="product_items", null=True)
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, blank=True,related_name="product_items", null=True)
     price = models.DecimalField(blank=False, decimal_places=2, default=0.00, max_digits=100000000)
     qty_in_stock = models.IntegerField(default=0, blank=False)
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
 # Product Images
 class ProductImage(models.Model):
-    product_id=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
 
 # Product Promotion
 class ProductPromotion(models.Model):
-    product_id=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="promos")
-    promotion_id=models.ForeignKey(Promotion, on_delete=models.CASCADE,related_name="products")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="promos")
+    promotion=models.ForeignKey(Promotion, on_delete=models.CASCADE,related_name="products")
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
 # Product Coupon
 class ProductCoupon(models.Model):
-    product_id=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="coupons")
-    coupon_id=models.ForeignKey(Coupon, on_delete=models.CASCADE,related_name="products")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE, related_name="coupons")
+    coupon=models.ForeignKey(Coupon, on_delete=models.CASCADE,related_name="products")
     status=models.CharField(max_length=100, blank=False, default="active", choices=GENERIC_STATUS)
 
 # Orders
@@ -131,7 +137,7 @@ class Order(models.Model):
         ("pickup_station","Pickup Station"),
         ("door_delivery","Door Delivery"),
     ]
-    user_id= models.ForeignKey(User, on_delete=models.SET_NULL, related_name="orders", null=True)
+    user= models.ForeignKey(User, on_delete=models.SET_NULL, related_name="orders", null=True)
 
     date= models.DateTimeField(auto_now_add=True)
 
@@ -153,24 +159,24 @@ class Cart(models.Model):
         ('not_checked_out','Yet to Check Out'),
         ('checked_out','Has Checked Out'),
     ]
-    user_id=models.ForeignKey(User, on_delete=models.CASCADE,related_name="carts")
+    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name="carts")
     status = models.CharField(max_length=100, blank=False, default="checked_out", choices=CART_STATUS)
     
 
 # Cart Items
 class CartItem(models.Model):
-    cart_id=models.ForeignKey(Cart, on_delete=models.CASCADE,related_name="items")
-    product_id=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="in_carts")
+    cart=models.ForeignKey(Cart, on_delete=models.CASCADE,related_name="items")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="in_carts")
 
 # Wishlist Items
 class Wishlist(models.Model):
-    user_id=models.ForeignKey(User, on_delete=models.CASCADE,related_name="wishlist")
-    product_id=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="in_wishlist")
+    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name="wishlist")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="in_wishlist")
 
 # User Review 
 class UserReview(models.Model):
-    user_id=models.ForeignKey(User, on_delete=models.CASCADE,related_name="reviews")
-    product_id=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="reviews")
+    user=models.ForeignKey(User, on_delete=models.CASCADE,related_name="reviews")
+    product=models.ForeignKey(Product, on_delete=models.CASCADE,related_name="reviews")
     rating_value=models.IntegerField(default=3, validators=[ MaxValueValidator(5),  MinValueValidator(1) ])
     comment=models.CharField(max_length=250, blank=True, default="")
 

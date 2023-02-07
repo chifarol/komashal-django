@@ -8,7 +8,15 @@ urlpatterns = [
     path('logout/', knox_views.LogoutView.as_view(), name='logout'),
     path('logoutall/', knox_views.LogoutAllView.as_view(), name='logoutall'),
 
-    
-    path('user', api.main_user),
+     
+    #Get and Update user profile
+    path('current_user', api.current_user),
+    #Create one time super_admin_user admin user
+    path('super_admin_user', api.super_admin_user),
+    #Create, Update, specific admin user
+    path('admin_user', api.admin_user),
+    #Create, Read, Update, Delete specific region
     path('region', api.region),
+    # fetch regions w/ limits
+    path('regions', api.regions),
 ]  
